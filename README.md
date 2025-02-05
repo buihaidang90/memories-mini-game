@@ -22,6 +22,8 @@ npm install
 npm run dev
 ```
 
+![alt text](https://github.com/buihaidang90/memories-mini-game/blob/main/Capture.png?raw=true)
+
 ### Compile and Minify for Production
 
 ```sh
