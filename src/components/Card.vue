@@ -1,79 +1,109 @@
 <template>
-  <div
-    class="bhd-card"
-    :class="[isDisabled ? 'card-disabled' : '']"
-    :card-data="item"
-    @click="onClickCard"
-  >
-    <div class="bhd-card-inner" :class="[isFlipped ? 'is-flipped' : '']">
-      <div class="bhd-card-face bhd-card-front"></div>
-      <div class="bhd-card-face bhd-card-rear"></div>
+  <div class="bhd-card" :class="{ 'card-disabled': props.cardData.disabled }">
+    <div
+      class="bhd-card-inner"
+      :class="{ 'is-flipped': props.cardData.flipped }"
+      @click="onToggleFlipCard"
+    >
+      <div class="bhd-card-face bhd-card-front">
+        <div class="bhd-front-content"></div>
+      </div>
+      <div class="bhd-card-face bhd-card-rear">
+        <div class="bhd-rear-content" :style="backgroundImageInlineStyle"></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-const isFlipped = ref(false);
-const isDisabled = ref(false);
-const cardPair = ref([]);
+import { computed, ref, onMounted } from "vue";
 
-const onClickCard = (e) => {
+const props = defineProps({
+  cardData: Object,
+  cardPair: Array,
+});
+const emit = defineEmits(["flipCard"]);
+
+onMounted(() => {
+  // let _path = "@../assets/images/" + props.cardData + ".png";
+  // console.log("url('" + _path + "')");
+});
+
+const onToggleFlipCard = (e) => {
   //   console.log("You have been click on card.")
-  if (isDisabled.value) return;
-  if (cardPair.value.length === 2) return;
-  isFlipped.value = true;
+  if (props.cardData.disabled) return;
+  // if (props.cardPair.length >= 2) return;
+
+  emit("flipCard", props.cardData, !props.cardData.flipped);
+  // console.log(props.cardData);
 };
+
+const backgroundImageInlineStyle = computed(() => {
+  let inlineStyle = `background-image: url("./src/assets/images/${props.cardData.num}.png")`;
+  // console.log(inlineStyle);
+  return inlineStyle;
+});
 </script>
 
 <style scoped>
 .bhd-card {
-  background-color: cadetblue;
   width: 80px;
   height: 120px;
+  /* cung cấp góc nhìn cho phần tử định vị 3D */
+  perspective: 500px;
 }
 .bhd-card:hover {
-  box-shadow: #01f50ddc 0px 3px 8px;
-}
-.bhd-card-inner {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  transition: transform 1s;
-  transform-style: preserve-3d;
-  cursor: pointer;
-  position: relative;
+  box-shadow: #e8f808dc 2px 2px 6px;
 }
 .card-disabled {
   cursor: default;
   pointer-events: none; /*disable hover events*/
 }
-.bhd-card-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  overflow: hidden;
-  border-radius: 8%;
-  /* padding: 1rem; */
-  /* box-shadow: 0 3px 18px 3px rgba(0, 0, 0, 0.2); */
+
+/* This container is needed to position the front and back side */
+.bhd-card-inner {
+  position: relative;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
   cursor: pointer;
-}
-.bhd-card-front {
-  background: url("../assets/images/back.png") no-repeat center center;
-  background-size: 80px;
-  height: 100%;
+  display: flex;
   width: 100%;
+  height: 100%;
 }
 .is-flipped {
   transform: rotateY(-180deg);
 }
+
+.bhd-card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* pointer-events: auto; */
+  /* overflow: hidden; */
+  border-radius: 8%;
+  -webkit-backface-visibility: hidden;
+  /* Safari */
+  backface-visibility: hidden;
+}
+
+.bhd-card-front {
+  background-color: cadetblue;
+}
+.bhd-front-content {
+  background: url("../assets/images/back.png") no-repeat center center;
+  background-size: 80px;
+  width: 100%;
+  height: 100%;
+}
+
 .bhd-card-rear {
-  background-color: #7831b6;
   transform: rotateY(-180deg);
-  /* background-position: center center;
+  background-color: #7831b6ad;
+}
+.bhd-rear-content {
+  background-position: center center;
   background-repeat: no-repeat;
-  background-size: contain; */
+  background-size: contain;
   width: 100%;
   height: 100%;
 }

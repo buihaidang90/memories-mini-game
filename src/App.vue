@@ -4,9 +4,14 @@
   <PlayMatch
     v-if="atLocation === 'match'"
     @clickBack="back2Select"
+    @finished="handleFinished"
     :data="dataArr"
   />
-  <Result v-if="atLocation === 'result'" />
+  <Result
+    v-if="atLocation === 'result'"
+    @clickBack="back2Select"
+    :counter="timeCost"
+  />
 </template>
 
 <script setup>
@@ -17,6 +22,7 @@ import Result from "./components/Result.vue";
 import { ref } from "vue";
 
 const atLocation = ref(""); // default, match, result
+const timeCost = ref(0);
 const dataArr = ref([]);
 const selectMode = (num) => {
   const maxNum = 61; // = total images have in [images] folder
@@ -34,10 +40,10 @@ const selectMode = (num) => {
     dataArr.value.push(i);
   }
   dataArr.value = [...dataArr.value, ...dataArr.value];
-  dataArr.value = shuffle(dataArr.value, 3);
-  console.log(dataArr.value.length);
+  dataArr.value = shuffleArr(dataArr.value, 10);
+  // console.log(dataArr.value.length);
 };
-const shuffle = (targetArr, frequency = 1) => {
+const shuffleArr = (targetArr, frequency = 1) => {
   // way 1:
   // targetArr.sort(() => randomNum());
 
@@ -68,6 +74,12 @@ const randomNum = () => {
 const back2Select = () => {
   atLocation.value = "";
   // console.log(atLocation.value);
+};
+
+const handleFinished = (counter) => {
+  atLocation.value = "result";
+  // console.log(atLocation.value);
+  timeCost.value = counter;
 };
 </script>
 
